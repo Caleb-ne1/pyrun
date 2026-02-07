@@ -58,4 +58,12 @@ program
         uninstallModule(projectPath, module);
     })
 
+program
+    .command('help')
+    .description('Show help information')
+    .action(() => {
+        const { showHelp } = require('../src/commands/help');
+        showHelp();
+    })
+    
 program.parse(process.argv);

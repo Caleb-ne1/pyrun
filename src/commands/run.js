@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const chokidar = require('chokidar');
 const { spawn } = require('child_process');
-const { getPackageVersion } = require('../../util/getPackageVersion');
 
 function runProject(projectPath, entryFile = null, options = {}) {
     // modules path
@@ -61,13 +60,13 @@ function runProject(projectPath, entryFile = null, options = {}) {
            if (!entryFile) entryFile = 'app.py';
            process.env.FLASK_APP = entryFile;
            command = path.join(venvPath, process.platform === 'win32' ? 'Scripts' : 'bin', 'flask');
-           args = ['run', '--host', host, '--port', port];
+           args = ['run', '--host', host, '--port', port, '--reload'];
             break;
         case 'fastapi':
             if (!entryFile) entryFile = 'main';
             if (entryFile.endsWith('.py')) entryFile = entryFile.replace(/\.py$/, '');
             command = path.join(venvPath, process.platform === 'win32' ? 'Scripts' : 'bin', 'uvicorn');
-            args = [`${entryFile}:app`, '--host', host, '--port', port];
+            args = [`${entryFile}:app`, '--host', host, '--port', port, '--reload', '--reload-dir', projectPath];
             break;
         case 'python':
             command = pythonPath;
@@ -81,7 +80,7 @@ function runProject(projectPath, entryFile = null, options = {}) {
     console.log(`Running ${framework} project with command: ${command} ${args.join(' ')}`);
     let child = spawn(command, args, { stdio: 'inherit' });
 
-    const watcher = chokidar.watch(`${projectPath}/**/*.py`, { ignoreInitial: true });
+    const watcher = chokidar.watch(path.join(projectPath, 'modules.json'), { ignoreInitial: true });
 
     watcher.on('change', (filePath) => {
         console.log(`File changed: ${filePath}. Restarting server...`);

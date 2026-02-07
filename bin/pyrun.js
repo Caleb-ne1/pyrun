@@ -30,4 +30,14 @@ program
         runProject(projectPath, entryFile, options);
     })
 
+program
+    .command('install <modules...>')
+    .description('Install additional Python modules to the project')
+    .showHelpAfterError('Usage: pyrun install <module1[:version]> <module2[:version]> ... \nExample: pyrun install requests flask:2.0.1')
+    .action((modules) => {
+        const { installModule } = require('../src/commands/install');
+        const projectPath = process.cwd();
+        installModule(projectPath, modules);
+    })
+
 program.parse(process.argv);

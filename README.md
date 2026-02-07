@@ -36,7 +36,7 @@ It brings a familiar, clean CLI experience to Python development.
 Install globally via npm:
 
 ``` bash
-npm install -g pyrun
+npm install -g @caleb-ne1/pyrun
 ```
 
 Verify installation:

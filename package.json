@@ -1,23 +1,33 @@
 {
-  "name": "pyrun-v2",
+  "name": "pyrun-cli",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "CLI tool to initialize and run Python projects",
   "bin": {
     "pyrun": "bin/pyrun.js"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["python", "cli", "project initializer", "django", "flask", "fastapi", "dev-tools"],
+  "author": "Caleb-ne1",
+  "license": "MIT",
   "type": "commonjs",
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calebkibet/pyrun.git"
+  },
+  "bugs": {
+    "url": "https://github.com/calebkibet/pyrun/issues"
+  },
+  "homepage": "https://github.com/calebkibet/pyrun#readme",
   "dependencies": {
     "chalk": "^5.6.2",
     "chokidar": "^5.0.0",
     "commander": "^14.0.3",
     "cross-spawn": "^7.0.6",
     "fs-extra": "^11.3.3"
+  },
+  "scripts": {
+    "start": "node bin/pyrun.js",
+    "test": "echo \"No tests yet\""
   }
 }
+

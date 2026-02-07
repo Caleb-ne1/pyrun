@@ -40,4 +40,14 @@ program
         installModule(projectPath, modules);
     })
 
+program
+    .command('uninstall <module>')
+    .description('Uninstall a Python module from the project')
+    .showHelpAfterError('Usage: pyrun uninstall <module> \nExample: pyrun uninstall requests')
+    .action((module) => {
+        const { uninstallModule } = require('../src/commands/uninstall');
+        const projectPath = process.cwd();
+        uninstallModule(projectPath, module);
+    })
+
 program.parse(process.argv);

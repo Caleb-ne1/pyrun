@@ -64,6 +64,41 @@ function installModule(projectPath, modules) {
     console.log('All modules installed/updated successfully');
 }
 
+// install all modules from modules.json
+function installAllModules(projectPath) {
+    const modulesPath = path.join(projectPath, 'modules.json');
+    if (!fs.existsSync(modulesPath)) {
+        console.error('modules.json not found in project directory. Please run "pyrun init <framework> <project-path>" first.');
+        process.exit(1);
+    }
+
+    const modules = fs.readJsonSync(modulesPath);
+    const deps = modules.dependencies || {};
+    if (Object.keys(deps).length === 0) {
+        console.log('No dependencies to install.');
+        return;
+    }
+
+    const venvPath = path.join(projectPath, 'venv');
+    const pipPath = process.platform === 'win32' 
+        ? path.join(venvPath, 'Scripts', 'pip.exe') :
+        path.join(venvPath, 'bin', 'pip');
+
+    console.log('Installing all dependencies from modules.json...');
+    for (const [packageName, version] of Object.entries(deps)) {
+        const pkgStr = version && version !== 'latest' ? `${packageName}==${version}` : packageName;
+        console.log(`Installing ${pkgStr}...`);
+        const result = spawnSync(pipPath, ['install', pkgStr], { stdio: 'inherit' });
+        
+        if (result.status !== 0) {
+            console.error(`Failed to install ${pkgStr}`);
+            process.exit(1);
+        }
+    }
+    console.log('All dependencies installed successfully');
+}
+
 module.exports = {
-    installModule
+    installModule,
+    installAllModules
 }

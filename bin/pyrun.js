@@ -31,13 +31,21 @@ program
     })
 
 program
-    .command('install <modules...>')
+    .command('install [modules...]')
     .description('Install additional Python modules to the project')
-    .showHelpAfterError('Usage: pyrun install <module1[:version]> <module2[:version]> ... \nExample: pyrun install requests flask:2.0.1')
-    .action((modules) => {
-        const { installModule } = require('../src/commands/install');
+    .option('--all', 'Install all modules listed in modules.json')
+    .showHelpAfterError('Usage: pyrun install <module1[:version]> <module2[:version]> ... \nExample: pyrun install requests flask:2.0.1 or pyrun install --all')
+    .action((modules, options) => {
+        const { installModule, installAllModules } = require('../src/commands/install');
         const projectPath = process.cwd();
-        installModule(projectPath, modules);
+        if (options.all) {
+            installAllModules(projectPath);
+        } else if (modules && modules.length > 0) {
+            installModule(projectPath, modules);
+        } else {
+            console.error('No modules specified. Use "pyrun install <module1[:version]> <module2[:version]> ..." or "pyrun install --all"');
+            process.exit(1);
+        }
     })
 
 program

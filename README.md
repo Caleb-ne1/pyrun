@@ -5,8 +5,6 @@
 
 # PyRun
 
-> A modern CLI for managing and running Python projects
-
 PyRun simplifies Python project setup, dependency management and
 development server execution with automatic virtual environment handling
 and reload behavior.
@@ -26,6 +24,8 @@ PyRun provides:
 -   Framework-aware run commands
 -   Host and port override support
 -   Automatic server refresh on dependency changes
+-   Optional reload with custom directories for development
+-   Run arbitrary Python modules with extra CLI arguments
 
 It brings a familiar, clean CLI experience to Python development.
 
@@ -82,6 +82,8 @@ pyrun run
 pyrun run app.py
 pyrun run app.py --port 3000
 pyrun run app.py --host 0.0.0.0 --port 8000
+pyrun run app.py --reload
+pyrun run app.py --reload --reloadDirs src,api
 ```
 
 PyRun automatically detects:
@@ -93,9 +95,30 @@ PyRun automatically detects:
 Frameworks with native reload support use their internal reload
 mechanisms for efficient development.
 
+Reload behavior:
+-  Optional --reload enables automatic server restart on code changes
+
+-  --reloadDirs allows specifying directories to watch for changes (defaults to project root if not provided)
+
+-  Supported frameworks: Flask and FastAPI
 ------------------------------------------------------------------------
 
-### 3. Install Dependencies
+### 3. Run Python Modules
+
+You can run Python modules like pyinstaller, pytest, black, etc., directly:
+
+```bash
+pyrun run <project> --module pyinstaller --extraArgs="--onefile --noconsole app.py"
+pyrun run <project> --module pytest --extraArgs="tests/"
+```
+
+- --module <module> specifies the Python module
+
+- --extraArgs passes additional CLI arguments to the module
+
+------------------------------------------------------------------------
+
+### 4. Install Dependencies
 
 Install one or multiple modules:
 
@@ -115,7 +138,7 @@ Behavior:
 
 ------------------------------------------------------------------------
 
-### 4. Install All Project Dependencies
+### 5. Install All Project Dependencies
 
 After cloning a project:
 
@@ -127,7 +150,7 @@ This installs all dependencies defined in `modules.json`.
 
 ------------------------------------------------------------------------
 
-### 5. Uninstall Modules
+### 6. Uninstall Modules
 
 ``` bash
 pyrun uninstall requests

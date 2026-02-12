@@ -2,12 +2,14 @@
 const { Command } = require('commander');
 const { initializeProject } = require('../src/commands/init');
 const { runProject } = require('../src/commands/run');
+const { showHelp } = require('../src/commands/help');
 const path = require('path');
 
 const program = new Command();
 
+program.helpOption(false)
 program
-  .version('1.0.0')
+  .version('1.1.0')
   .description('PyRun CLI - Python project runner & dependency manager');
 
 program
@@ -20,15 +22,54 @@ program
   });
 
 program
-    .command('run [entryFile]')
-    .description('Run the Python project')
-    .showHelpAfterError('Usage: pyrun run [entry-file] [options(--host <host> --port <port>)] \nIf entry-file is not provided, pyrun will try to auto-detect it')
-    .option('--port <port>', 'Specify the port to run the server on')
-    .option('--host <host>', 'Specify the host to run the server on')
-    .action((entryFile = null, options) => {
-        const projectPath = process.cwd();
-        runProject(projectPath, entryFile, options);
-    })
+  .command("run [entryFile]")
+  .description("Run the Python project")
+  .showHelpAfterError(
+    "Usage: pyrun run [entry-file] [options]\n" +
+      "\nDescription:\n" +
+      "  Run a Python project or module.\n" +
+      "\nOptions:\n" +
+      "  --host <host>           Specify the host address\n" +
+      "  --port <port>           Specify the port number\n" +
+      "  --module <module>       Run a Python module (e.g. pyinstaller, pytest)\n" +
+      "  --reload                Enable auto-reload\n" +
+      "  --reloadDirs <dirs>     Comma-separated directories to watch for reload\n" +
+      "  --extraArgs <args>      Extra arguments to pass to the module or script\n" +
+      "\nNotes:\n" +
+      "  If no entry file is provided, pyrun will attempt to auto-detect the main Python file.\n" +
+      "\nExamples:\n" +
+      "  pyrun run app.py\n" +
+      "  pyrun run --reload\n" +
+      '  pyrun run --module pyinstaller --extraArgs="--onefile app.py"\n',
+    )
+  .option("--port <port>", "Specify the port to run the server on")
+  .option("--host <host>", "Specify the host to run the server on")
+  .option(
+    "--module <module>",
+    "Specify a Python module to run (e.g. pyinstaller, pytest)",
+  )
+  .option("--reload", "enable auto reload", false)
+  .option("--extraArgs <args>", "Extra arguments to pass to module/script")
+  .option(
+    "--reloadDirs <dirs>",
+    "Comma-separated directories to watch for reload",
+    "",
+  )
+  .action((entryFile = null, options) => {
+    const projectPath = process.cwd();
+
+    const extraArgs = options.extraArgs
+      ? options.extraArgs.split(" ").filter(Boolean)
+      : undefined;
+
+    const reloadDirs = options.reloadDirs
+      ? options.reloadDirs
+          .split(",")
+          .map((dir) => path.resolve(projectPath, dir.trim()))
+      : undefined;
+
+    runProject(projectPath, entryFile, { ...options, extraArgs, reloadDirs });
+  });
 
 program
     .command('install [modules...]')
@@ -59,11 +100,9 @@ program
     })
 
 program
-    .command('--help')
-    .description('Show help information')
-    .action(() => {
-        const { showHelp } = require('../src/commands/help');
-        showHelp();
-    })
+  .option('-h, --help', 'Show help', () => {
+    showHelp();
+    process.exit(0);
+  });
 
 program.parse(process.argv);

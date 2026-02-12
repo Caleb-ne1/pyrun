@@ -25,6 +25,9 @@ function runProject(projectPath, entryFile = null, options = {}) {
     const host = options.host || 'localhost';
     // port
     const port = options.port || (framework === 'django' ? 8000 : 5000);
+    
+    const reload = options.reload || false
+    const reloadDirs = options.reloadDirs || [projectPath];
 
     // auto detect entry file if not provided
     if (!entryFile) {
@@ -60,21 +63,28 @@ function runProject(projectPath, entryFile = null, options = {}) {
            if (!entryFile) entryFile = 'app.py';
            process.env.FLASK_APP = entryFile;
            command = path.join(venvPath, process.platform === 'win32' ? 'Scripts' : 'bin', 'flask');
-           args = ['run', '--host', host, '--port', port, '--reload'];
-            break;
+           args = ['run', '--host', host, '--port', port];
+           if (reload) args.push('--reload');
+           break;
         case 'fastapi':
             if (!entryFile) entryFile = 'main';
             if (entryFile.endsWith('.py')) entryFile = entryFile.replace(/\.py$/, '');
             command = path.join(venvPath, process.platform === 'win32' ? 'Scripts' : 'bin', 'uvicorn');
-            args = [`${entryFile}:app`, '--host', host, '--port', port, '--reload', '--reload-dir', projectPath];
+            args = [`${entryFile}:app`, '--host', host, '--port', port];
+            if (reload) {
+                args.push('--reload');
+                reloadDirs.forEach(dir => args.push('--reload-dir', dir));
+            }
             break;
         case 'python':
-            command = pythonPath;
-            args = [entryFile];
-            break;
         default:
-            console.error(`Unsupported framework: ${framework}`);
-            process.exit(1);
+            if (options.module) {
+                command = pythonPath;
+                args = ['-m', options.module, ...(options.extraArgs || [])];
+            } else {
+                command = pythonPath;
+                args = [entryFile, ...(options.extraArgs || [])];
+            }
     }
 
     console.log(`Running ${framework} project with command: ${command} ${args.join(' ')}`);

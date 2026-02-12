@@ -5,10 +5,18 @@ PyRun - Python Project Runner
 Usage:
   Pyrun --version
   pyrun init <framework> [path]
-  pyrun run [entry-file] [--port <port>] [--host <host>]
+  pyrun run [entry-file] [options]
   pyrun install <module[:version]> ...
   pyrun install --all
   pyrun uninstall <module>
+
+Run Options:
+  --host <host>           Specify the host address
+  --port <port>           Specify the port number
+  --module <module>       Run a Python module (e.g. pyinstaller, pytest)
+  --reload                Enable auto-reload
+  --reloadDirs <dirs>     Comma-separated directories to watch for reload
+  --extraArgs <args>      Extra arguments to pass to the module or script
 
 Examples:
   pyrun init fastapi .
